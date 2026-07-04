@@ -1,0 +1,79 @@
+export default {
+  app: { title: 'Finance Tracker', subtitle: 'Track every expense' },
+  nav: { add: 'Add', list: 'History', stats: 'Stats', settings: 'Settings' },
+  add: {
+    amount: 'Amount', category: 'Category', date: 'Date', note: 'Note',
+    notePlaceholder: 'Optional...', account: 'Account', receipt: 'Receipt',
+    photoBtn: '📷 Take Photo', photoDone: '📷 Selected',
+    ocrBtn: '🔍 OCR Scan', voiceBtn: '🎤', save: 'Save',
+    saveSuccess: 'Saved!', saveAsTemplate: 'Save as template?',
+    saveTemplate: 'Save', noThanks: 'No thanks', templateSaved: 'Template saved'
+  },
+  list: {
+    title: 'History', search: 'Search notes, categories...',
+    allCategories: 'All Categories', allAccounts: 'All Accounts',
+    total: 'Total', empty: 'No records',
+    deleteConfirm: 'Delete "{0} ¥{1}"?',
+    deleteTitle: 'Confirm Delete', delete: 'Delete', cancel: 'Cancel'
+  },
+  stats: {
+    title: 'Statistics', totalSpent: 'Total', exportExcel: '📥 Excel',
+    exportPdf: '📄 PDF Report', exportSuccess: 'Exported', noData: 'No data',
+    quickLabels: { '7d': '7 Days', '30d': '30 Days', month: 'Month', year: 'Year' },
+    pieTitle: 'Category Breakdown', lineTitle: '6-Month Trend', rankTitle: 'Ranking',
+    prediction: '🔮 Prediction', tagCloud: '🏷️ Tag Cloud',
+    compareMom: '📊 Month-over-Month',
+    compareYoy: '📈 Year-over-Year',
+    predict: { avgDaily: 'Daily Avg', predictEnd: 'Predicted', passedDays: 'Days Passed', noExpense: 'No expenses this month' }
+  },
+  settings: {
+    title: 'Settings', darkMode: 'Dark Mode', on: 'On', off: 'Off',
+    appLock: 'App Lock', lockPwd: 'New Password', setLockPwd: 'Set Password',
+    savePwd: 'Save', enableLock: 'Enable Lock',
+    lockOn: 'App Lock enabled', lockOff: 'App Lock disabled', pwdUpdated: 'Password updated',
+    budget: 'Budget Management', budgetDesc: 'Set monthly and category budgets',
+    saving: 'Savings Goal', savingDesc: 'Set and track savings goals',
+    recurring: 'Recurring Bills', recurringDesc: 'Auto-record rent, subscriptions',
+    importBill: '📥 Import Bills', importBillDesc: 'Import WeChat/Alipay CSV',
+    language: '🌐 Language', languageDesc: '中文 / English',
+    dataSection: 'Data Management',
+    exportData: 'Export Backup', exportDataDesc: 'Export all data as JSON',
+    importData: 'Import Restore', importDataDesc: 'Restore from backup file',
+    exportExcel: 'Export Excel', exportExcelDesc: 'Export all data as Excel',
+    version: 'Version',
+    exportOk: 'Backup exported', exportFail: 'Export failed',
+    importOk: 'Imported: {0} new, {1} skipped', importFail: 'Import failed',
+    importConfirm: 'Data will be merged (duplicates skipped). Continue?'
+  },
+  lock: { title: 'Finance Tracker', hint: 'Enter password to unlock', unlock: 'Unlock', error: 'Incorrect password' },
+  budget: {
+    totalMonthly: '💰 Monthly Budget', totalMonth: 'Month Budget',
+    categoryBudget: '📂 Category Budget', save: 'Save',
+    totalSaved: 'Default budget saved', monthSaved: 'Month budget saved',
+    catSaved: 'Budget saved'
+  },
+  saving: {
+    create: 'Create Goal', namePlaceholder: 'e.g. Travel Fund',
+    amountLabel: 'Target ¥', deadlineLabel: 'Deadline',
+    goalCreated: 'Goal created!', goalDeleted: 'Goal deleted',
+    saved: 'Saved', remaining: 'Remaining', dailyNeed: 'Daily need',
+    update: 'Update', updatePlaceholder: 'Add saved amount',
+    updated: 'Saved amount updated to ¥{0}'
+  },
+  recurring: {
+    namePlaceholder: 'Name (e.g. Rent)', amountPlaceholder: 'Amount',
+    categoryPlaceholder: 'Category', subPlaceholder: 'Sub-category',
+    monthly: 'Monthly', weekly: 'Weekly', daily: 'Daily',
+    dayPlaceholder: 'Day', addBtn: 'Add Recurring Bill',
+    added: 'Recurring bill added'
+  },
+  import: {
+    title: 'Import Bills', selectFile: 'Select CSV File',
+    wechatFormat: 'WeChat Format', alipayFormat: 'Alipay Format',
+    preview: 'Preview ({0} items)', selectAll: 'Select All', deselectAll: 'Deselect All',
+    autoClassify: 'Auto-classify by merchant name',
+    import: 'Confirm Import', importing: 'Importing...', done: 'Imported: {0} items'
+  },
+  voice: { listening: 'Listening...', stop: 'Stop', retry: 'Retry', notSupported: 'Voice not supported' },
+  common: { yes: 'OK', no: 'Cancel', ok: 'Got it' }
+}

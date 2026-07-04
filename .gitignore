@@ -1,0 +1,17 @@
+# 第三方依赖（200MB+，npm install 即可恢复）
+node_modules/
+
+# 构建产物
+out/
+
+# 打包输出
+release/
+
+# 系统文件
+.DS_Store
+Thumbs.db
+*.log
+
+# IDE
+.vscode/
+.idea/

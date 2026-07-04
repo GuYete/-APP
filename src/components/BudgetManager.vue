@@ -1,0 +1,235 @@
+<template>
+  <div class="budget-manager">
+    <!-- 总预算设置 -->
+    <div class="budget-section">
+      <div class="budget-section-title">💰 每月总预算</div>
+      <div class="budget-input-row">
+        <span class="currency">¥</span>
+        <input
+          v-model.number="totalBudget"
+          type="number"
+          class="budget-input"
+          placeholder="设置每月总预算"
+          min="0"
+          step="100"
+        />
+        <button class="save-btn-sm" @click="saveTotalBudget">保存</button>
+      </div>
+      <div v-if="totalBudget > 0" class="budget-hint">
+        默认应用于所有月份。可为特定月份单独设置。
+      </div>
+    </div>
+
+    <!-- 特定月份总预算 -->
+    <div class="budget-section">
+      <div class="budget-section-title">📅 {{ currentMonth }} 月预算</div>
+      <div class="budget-input-row">
+        <span class="currency">¥</span>
+        <input
+          v-model.number="monthBudget"
+          type="number"
+          class="budget-input"
+          placeholder="为本月单独设置总预算"
+          min="0"
+          step="100"
+        />
+        <button class="save-btn-sm" @click="saveMonthBudget">保存</button>
+      </div>
+      <div v-if="monthBudget > 0" class="budget-hint">
+        本月已消费 ¥{{ monthSpent.toFixed(0) }}，剩余 ¥{{ (monthBudget - monthSpent).toFixed(0) }}
+      </div>
+    </div>
+
+    <!-- 分类预算 -->
+    <div class="budget-section">
+      <div class="budget-section-title">📂 分类预算（可选）</div>
+      <div
+        v-for="cat in categories"
+        :key="cat.name"
+        class="category-budget-row"
+      >
+        <span class="cat-budget-icon">{{ cat.icon }}</span>
+        <span class="cat-budget-name">{{ cat.name }}</span>
+        <input
+          v-model.number="categoryBudgets[cat.name]"
+          type="number"
+          class="cat-budget-input"
+          placeholder="不限"
+          min="0"
+          step="100"
+        />
+        <button
+          v-if="categoryBudgets[cat.name] > 0"
+          class="save-cat-btn"
+          @click="saveCategoryBudget(cat.name)"
+        >✓</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from 'vue'
+import { useExpenseStore } from '@/stores/expense'
+import { categories } from '@/data/categories'
+import { ElMessage } from 'element-plus'
+
+const store = useExpenseStore()
+
+const currentMonth = store.selectedMonth
+const monthSpent = ref(0)
+
+const totalBudget = ref(0)
+const monthBudget = ref(0)
+const categoryBudgets = ref<Record<string, number>>({})
+
+onMounted(async () => {
+  await store.loadBudgets()
+  monthSpent.value = store.getMonthTotal(currentMonth)
+
+  // 加载已有预算
+  totalBudget.value = store.getBudget('', '')
+  monthBudget.value = store.getBudget(currentMonth, '')
+
+  for (const cat of categories) {
+    const b = store.getBudget(currentMonth, cat.name) || store.getBudget('', cat.name)
+    if (b > 0) {
+      categoryBudgets.value[cat.name] = b
+    } else {
+      categoryBudgets.value[cat.name] = 0
+    }
+  }
+})
+
+async function saveTotalBudget(): Promise<void> {
+  if (totalBudget.value < 0) return
+  if (totalBudget.value === 0) {
+    // 删除
+    const b = store.budgets.find(bb => bb.yearMonth === '' && bb.categoryL1 === '')
+    if (b?.id) await store.deleteBudget(b.id)
+  } else {
+    await store.saveBudget({ yearMonth: '', categoryL1: '', amount: totalBudget.value })
+  }
+  ElMessage.success('默认总预算已保存')
+}
+
+async function saveMonthBudget(): Promise<void> {
+  if (monthBudget.value < 0) return
+  if (monthBudget.value === 0) {
+    const b = store.budgets.find(bb => bb.yearMonth === currentMonth && bb.categoryL1 === '')
+    if (b?.id) await store.deleteBudget(b.id)
+  } else {
+    await store.saveBudget({ yearMonth: currentMonth, categoryL1: '', amount: monthBudget.value })
+  }
+  ElMessage.success(`${currentMonth} 总预算已保存`)
+}
+
+async function saveCategoryBudget(catName: string): Promise<void> {
+  const amount = categoryBudgets.value[catName]
+  if (!amount || amount <= 0) return
+  await store.saveBudget({ yearMonth: currentMonth, categoryL1: catName, amount })
+  ElMessage.success(`${catName} 预算已保存`)
+}
+</script>
+
+<style scoped>
+.budget-manager {
+  padding: 0;
+}
+
+.budget-section {
+  margin-bottom: 16px;
+}
+
+.budget-section-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.budget-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.currency {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.budget-input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.save-btn-sm {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--primary);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.budget-hint {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 6px;
+}
+
+.category-budget-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-light);
+}
+
+.cat-budget-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.cat-budget-name {
+  font-size: 13px;
+  color: var(--text);
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.cat-budget-input {
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 13px;
+  outline: none;
+  background: var(--bg);
+  color: var(--text);
+  width: 80px;
+  text-align: right;
+}
+
+.save-cat-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: var(--success);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+}
+</style>
