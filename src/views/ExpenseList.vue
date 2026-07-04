@@ -1,7 +1,7 @@
 <template>
   <div class="expense-list">
     <div class="page-header">
-      <h2 class="page-title">明细</h2>
+      <h2 class="page-title">{{ t('list.title') }}</h2>
     </div>
 
     <!-- 搜索框 -->
@@ -11,7 +11,7 @@
         v-model="store.searchQuery"
         type="text"
         class="search-input"
-        placeholder="搜索备注、分类、金额..."
+        :placeholder="t('list.search')"
       />
     </div>
 
@@ -23,13 +23,13 @@
         class="month-input"
       />
       <select v-model="store.categoryFilter" class="category-select">
-        <option value="">全部分类</option>
-        <option v-for="cat in categories" :key="cat.name" :value="cat.name">
+        <option value="">{{ t('list.allCategories') }}</option>
+        <option v-for="cat in catStore.allCategories" :key="cat.name" :value="cat.name">
           {{ cat.icon }} {{ cat.name }}
         </option>
       </select>
       <select v-model="store.accountFilter" class="account-select">
-        <option value="">全部账户</option>
+        <option value="">{{ t('list.allAccounts') }}</option>
         <option v-for="acc in accounts" :key="acc.key" :value="acc.key">
           {{ acc.icon }} {{ acc.name }}
         </option>
@@ -38,14 +38,14 @@
 
     <!-- 本月合计 -->
     <div class="total-bar">
-      <span class="total-label">{{ displayMonth }} 合计</span>
+      <span class="total-label">{{ displayMonth }} {{ t('list.total') }}</span>
       <span class="total-amount">¥{{ totalAmount.toFixed(2) }}</span>
     </div>
 
     <!-- 花销列表 -->
     <div v-if="groupedExpenses.length === 0" class="empty-state">
       <span class="empty-icon">📭</span>
-      <p>暂无记录</p>
+      <p>{{ t('list.empty') }}</p>
     </div>
 
     <div v-else class="list-wrapper">
@@ -88,13 +88,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useExpenseStore } from '@/stores/expense'
-import { categories, getCategoryByName } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+import { useI18n } from 'vue-i18n'
+import { getCategoryByName } from '@/data/categories'
 import { getAccountByKey } from '@/data/accounts'
 import { accounts } from '@/data/accounts'
 import { ElMessageBox } from 'element-plus'
 import PhotoViewer from '@/components/PhotoViewer.vue'
 
 const store = useExpenseStore()
+const catStore = useCategoryStore()
+const { t } = useI18n()
 
 const searchMonth = ref(store.selectedMonth)
 const showPhoto = ref(false)
@@ -166,11 +170,11 @@ function formatDate(dateStr: string): string {
 async function onDelete(expense: { id?: number; amount: number; categoryL2: string }): Promise<void> {
   try {
     await ElMessageBox.confirm(
-      `确定删除「${expense.categoryL2} ¥${expense.amount.toFixed(2)}」吗？`,
-      '删除确认',
+      t('list.deleteConfirm', [expense.categoryL2, expense.amount.toFixed(2)]),
+      t('list.deleteTitle'),
       {
-        confirmButtonText: '删除',
-        cancelButtonText: '取消',
+        confirmButtonText: t('list.delete'),
+        cancelButtonText: t('list.cancel'),
         type: 'warning'
       }
     )

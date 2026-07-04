@@ -83,6 +83,7 @@ export const useSettingsStore = defineStore('settings', () => {
 
   // 简单哈希（不存储明文）
   function hashPassword(password: string): string {
+    if (!password) return ''
     let hash = 0
     for (let i = 0; i < password.length; i++) {
       const char = password.charCodeAt(i)

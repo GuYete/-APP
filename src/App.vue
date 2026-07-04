@@ -23,25 +23,28 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
+import { useCategoryStore } from '@/stores/category'
+import { useI18n } from 'vue-i18n'
 import { db } from '@/db'
 import LockScreen from '@/views/LockScreen.vue'
 
 const route = useRoute()
 const router = useRouter()
 const settings = useSettingsStore()
+const { t } = useI18n()
 
 const showLock = ref(false)
 const themeReady = ref(false)
 
-const tabs = [
-  { path: '/add', icon: '✏️', label: '记账' },
-  { path: '/list', icon: '📋', label: '明细' },
-  { path: '/stats', icon: '📊', label: '统计' },
-  { path: '/settings', icon: '⚙️', label: '设置' }
-]
+const tabs = computed(() => [
+  { path: '/add', icon: '✏️', label: t('nav.add') },
+  { path: '/list', icon: '📋', label: t('nav.list') },
+  { path: '/stats', icon: '📊', label: t('nav.stats') },
+  { path: '/settings', icon: '⚙️', label: t('nav.settings') }
+])
 
 // 全局快捷键
 function onKeydown(e: KeyboardEvent): void {
@@ -53,40 +56,48 @@ function onKeydown(e: KeyboardEvent): void {
 
 // 自动记录定期账单
 async function autoRecordRecurring(): Promise<void> {
-  const bills = await db.recurring.where({ enabled: true }).toArray()
-  const today = new Date()
-  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  try {
+    const bills = await db.recurring.where({ enabled: true }).toArray()
+    const today = new Date()
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
-  for (const bill of bills) {
-    let shouldRecord = false
+    for (const bill of bills) {
+      let shouldRecord = false
+      const lastRecorded = bill.lastRecorded || ''
 
-    if (bill.cycle === 'daily') {
-      shouldRecord = bill.lastRecorded !== todayStr
-    } else if (bill.cycle === 'monthly') {
-      shouldRecord = today.getDate() === bill.dayOfMonth && !bill.lastRecorded.startsWith(todayStr.substring(0, 7))
-    } else if (bill.cycle === 'weekly') {
-      shouldRecord = today.getDay() === bill.dayOfWeek && bill.lastRecorded !== todayStr
+      if (bill.cycle === 'daily') {
+        shouldRecord = lastRecorded !== todayStr
+      } else if (bill.cycle === 'monthly') {
+        shouldRecord = today.getDate() === bill.dayOfMonth && !lastRecorded.startsWith(todayStr.substring(0, 7))
+      } else if (bill.cycle === 'weekly') {
+        shouldRecord = today.getDay() === bill.dayOfWeek && lastRecorded !== todayStr
+      }
+
+      if (shouldRecord) {
+        await db.expenses.add({
+          amount: bill.amount, categoryL1: bill.categoryL1, categoryL2: bill.categoryL2,
+          account: bill.account, date: todayStr, note: `${bill.name}（自动记录）`,
+          photo: '', createdAt: Date.now()
+        })
+        await db.recurring.update(bill.id!, { lastRecorded: todayStr })
+      }
     }
-
-    if (shouldRecord) {
-      await db.expenses.add({
-        amount: bill.amount, categoryL1: bill.categoryL1, categoryL2: bill.categoryL2,
-        account: bill.account, date: todayStr, note: `${bill.name}（自动记录）`,
-        photo: '', createdAt: Date.now()
-      })
-      await db.recurring.update(bill.id!, { lastRecorded: todayStr })
-    }
+  } catch (e) {
+    console.error('autoRecordRecurring:', e)
   }
 }
 
 onMounted(async () => {
-  await settings.loadSettings()
-  // 自动记录定期账单
-  await autoRecordRecurring()
+  try {
+    await settings.loadSettings()
+    const catStore = useCategoryStore()
+    await catStore.ensureLoaded()
+    await autoRecordRecurring()
+  } catch (e) {
+    console.error('[App init]', e)
+  }
   document.addEventListener('keydown', onKeydown)
   themeReady.value = true
-
-  // 检查是否需要显示应用锁
   if (settings.lockEnabled) {
     showLock.value = true
   }

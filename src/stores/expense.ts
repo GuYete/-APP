@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { db, type Expense, type Budget } from '@/db'
 import { categories } from '@/data/categories'
 import { accounts } from '@/data/accounts'
+import { useCategoryStore } from '@/stores/category'
 
 export const useExpenseStore = defineStore('expense', () => {
   const expenses = ref<Expense[]>([])
@@ -99,7 +100,8 @@ export const useExpenseStore = defineStore('expense', () => {
 
     // 检查各分类预算
     const monthExpenses = getExpensesByMonth(yearMonth)
-    for (const cat of categories) {
+    const catStore = useCategoryStore()
+    for (const cat of catStore.allCategories) {
       const catBudget = getBudget(yearMonth, cat.name)
       if (catBudget > 0) {
         const catSpent = monthExpenses.filter(e => e.categoryL1 === cat.name).reduce((s, e) => s + e.amount, 0)
@@ -132,7 +134,8 @@ export const useExpenseStore = defineStore('expense', () => {
 
   function getCategorySummaryByRange(start: string, end: string): { name: string; icon: string; color: string; total: number }[] {
     const list = getExpensesByDateRange(start, end)
-    return categories.map(cat => {
+    const catStore = useCategoryStore()
+    return catStore.allCategories.map(cat => {
       const total = list.filter(e => e.categoryL1 === cat.name).reduce((sum, e) => sum + e.amount, 0)
       return { name: cat.name, icon: cat.icon, color: cat.color, total }
     }).filter(c => c.total > 0).sort((a, b) => b.total - a.total)

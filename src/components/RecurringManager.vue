@@ -21,32 +21,32 @@
     <!-- 添加新账单 -->
     <div class="add-bill">
       <div class="form-row">
-        <input v-model="form.name" class="bill-input" placeholder="名称（如：房租）" />
-        <input v-model.number="form.amount" type="number" class="bill-input short" placeholder="金额" min="0" step="0.01" />
+        <input v-model="form.name" class="bill-input" :placeholder="t('recurring.namePlaceholder')" />
+        <input v-model.number="form.amount" type="number" class="bill-input short" :placeholder="t('recurring.amountPlaceholder')" min="0" step="0.01" />
       </div>
       <div class="form-row">
         <select v-model="form.categoryL1" class="bill-input" @change="form.categoryL2 = ''">
-          <option value="">选分类</option>
-          <option v-for="cat in categories" :key="cat.name" :value="cat.name">{{ cat.icon }} {{ cat.name }}</option>
+          <option value="">{{ t('recurring.categoryPlaceholder') }}</option>
+          <option v-for="cat in catStore.allCategories" :key="cat.name" :value="cat.name">{{ cat.icon }} {{ cat.name }}</option>
         </select>
         <select v-model="form.categoryL2" class="bill-input">
-          <option value="">选小类</option>
+          <option value="">{{ t('recurring.subPlaceholder') }}</option>
           <option v-for="sub in subCats" :key="sub" :value="sub">{{ sub }}</option>
         </select>
       </div>
       <div class="form-row">
         <select v-model="form.cycle" class="bill-input">
-          <option value="monthly">每月</option>
-          <option value="weekly">每周</option>
-          <option value="daily">每天</option>
+          <option value="monthly">{{ t('recurring.monthly') }}</option>
+          <option value="weekly">{{ t('recurring.weekly') }}</option>
+          <option value="daily">{{ t('recurring.daily') }}</option>
         </select>
-        <input v-if="form.cycle === 'monthly'" v-model.number="form.dayOfMonth" type="number" class="bill-input short" placeholder="几号" min="1" max="31" />
+        <input v-if="form.cycle === 'monthly'" v-model.number="form.dayOfMonth" type="number" class="bill-input short" :placeholder="t('recurring.dayPlaceholder')" min="1" max="31" />
         <select v-if="form.cycle === 'weekly'" v-model="form.dayOfWeek" class="bill-input">
-          <option :value="1">周一</option><option :value="2">周二</option><option :value="3">周三</option>
-          <option :value="4">周四</option><option :value="5">周五</option><option :value="6">周六</option><option :value="0">周日</option>
+          <option :value="1">{{ t('recurring.weekday1') }}</option><option :value="2">{{ t('recurring.weekday2') }}</option><option :value="3">{{ t('recurring.weekday3') }}</option>
+          <option :value="4">{{ t('recurring.weekday4') }}</option><option :value="5">{{ t('recurring.weekday5') }}</option><option :value="6">{{ t('recurring.weekday6') }}</option><option :value="0">{{ t('recurring.weekday0') }}</option>
         </select>
       </div>
-      <button class="add-btn" @click="onAdd">添加定期账单</button>
+      <button class="add-btn" @click="onAdd">{{ t('recurring.addBtn') }}</button>
     </div>
   </div>
 </template>
@@ -54,8 +54,12 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { db, type RecurringBill } from '@/db'
-import { categories } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+import { useI18n } from 'vue-i18n'
 import { ElMessage, ElMessageBox } from 'element-plus'
+
+const catStore = useCategoryStore()
+const { t, locale } = useI18n()
 
 const bills = ref<RecurringBill[]>([])
 const form = ref({
@@ -64,14 +68,19 @@ const form = ref({
 })
 
 const subCats = computed(() => {
-  const cat = categories.find(c => c.name === form.value.categoryL1)
+  const cat = catStore.allCategories.find(c => c.name === form.value.categoryL1)
   return cat?.children || []
 })
 
 function cycleLabel(b: RecurringBill): string {
-  if (b.cycle === 'monthly') return `每月${b.dayOfMonth}日`
-  if (b.cycle === 'weekly') return `每周${['日','一','二','三','四','五','六'][b.dayOfWeek]}`
-  return '每天'
+  const sp = locale.value === 'zh-CN' ? '' : ' '
+  if (b.cycle === 'monthly') return t('recurring.monthly') + sp + b.dayOfMonth + t('recurring.daySuffix')
+  if (b.cycle === 'weekly') {
+    let wd = t('recurring.weekday' + b.dayOfWeek)
+    if (wd.startsWith('周')) wd = wd.substring(1)
+    return t('recurring.weekly') + sp + wd
+  }
+  return t('recurring.daily')
 }
 
 async function load(): Promise<void> {
@@ -84,14 +93,14 @@ async function onToggle(bill: RecurringBill): Promise<void> {
 }
 
 async function onDelete(bill: RecurringBill): Promise<void> {
-  try { await ElMessageBox.confirm(`删除「${bill.name}」？`, '确认', { type: 'warning' }) } catch { return }
+  try { await ElMessageBox.confirm(t('recurring.deleteConfirm', [bill.name]), t('recurring.deleteTitle'), { type: 'warning' }) } catch { return }
   await db.recurring.delete(bill.id!)
   await load()
 }
 
 async function onAdd(): Promise<void> {
   if (!form.value.name || !form.value.amount || !form.value.categoryL2) {
-    ElMessage.warning('请填写完整信息')
+    ElMessage.warning(t('recurring.incomplete'))
     return
   }
   await db.recurring.add({
@@ -103,7 +112,7 @@ async function onAdd(): Promise<void> {
   })
   form.value = { name: '', amount: 0, categoryL1: '', categoryL2: '', cycle: 'monthly', dayOfMonth: 1, dayOfWeek: 1 }
   await load()
-  ElMessage.success('定期账单已添加')
+  ElMessage.success(t('recurring.added'))
 }
 
 onMounted(load)

@@ -1,7 +1,7 @@
 <template>
   <div class="tag-cloud-card">
-    <div class="tag-cloud-title">🏷️ 消费标签云</div>
-    <div v-if="tags.length === 0" class="tag-empty">本月暂无消费</div>
+    <div class="tag-cloud-title">{{ t('stats.tagCloud') }}</div>
+    <div v-if="tags.length === 0" class="tag-empty">{{ t('stats.noData') }}</div>
     <div v-else class="tag-cloud">
       <span
         v-for="tag in tags"
@@ -22,8 +22,11 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import type { Expense } from '@/db'
-import { categories } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   expenses: Expense[]
@@ -44,7 +47,8 @@ const tags = computed(() => {
 
   // 找到对应的一级分类颜色
   function getColor(catL2: string): string {
-    for (const cat of categories) {
+    const catStore = useCategoryStore()
+    for (const cat of catStore.allCategories) {
       if (cat.children.includes(catL2)) return cat.color
     }
     return '#909399'

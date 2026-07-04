@@ -18,14 +18,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { db, type ExpenseTemplate } from '@/db'
-import { getCategoryByName } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+
+const catStore = useCategoryStore()
 
 defineEmits<{ apply: [tmpl: ExpenseTemplate] }>()
 
 const templates = ref<ExpenseTemplate[]>([])
 
 function getIcon(cat: string): string {
-  return getCategoryByName(cat)?.icon || '💰'
+  return catStore.allCategories.find(c => c.name === cat)?.icon || '💰'
 }
 
 async function load(): Promise<void> {

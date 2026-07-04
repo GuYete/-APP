@@ -1,7 +1,7 @@
 <template>
   <div class="statistics">
     <div class="page-header">
-      <h2 class="page-title">统计</h2>
+      <h2 class="page-title">{{ t('stats.title') }}</h2>
     </div>
 
     <!-- 日期范围选择 -->
@@ -30,26 +30,26 @@
 
     <!-- 导出按钮 -->
     <div class="export-buttons">
-      <button class="export-btn" @click="onExportExcel">📥 Excel</button>
-      <button class="export-btn" @click="onExportPDF">📄 PDF 报表</button>
+      <button class="export-btn" @click="onExportExcel">{{ t('stats.exportExcel') }}</button>
+      <button class="export-btn" @click="onExportPDF">{{ t('stats.exportPdf') }}</button>
     </div>
 
     <!-- 空数据 -->
     <div v-if="categorySummary.length === 0" class="empty-state">
       <span class="empty-icon">📊</span>
-      <p>本月暂无记录</p>
+      <p>{{ t('stats.noData') }}</p>
     </div>
 
     <template v-else>
       <!-- 分类占比饼图 -->
       <div class="chart-card">
-        <div class="chart-title">分类占比</div>
+        <div class="chart-title">{{ t('stats.pieTitle') }}</div>
         <div ref="pieChartRef" class="chart-box"></div>
       </div>
 
       <!-- 月度趋势折线图 -->
       <div class="chart-card">
-        <div class="chart-title">近6个月趋势</div>
+        <div class="chart-title">{{ t('stats.lineTitle') }}</div>
         <div ref="lineChartRef" class="chart-box"></div>
       </div>
 
@@ -61,7 +61,7 @@
 
       <!-- 分类排行 -->
       <div class="rank-card">
-        <div class="chart-title">分类排行</div>
+        <div class="chart-title">{{ t('stats.rankTitle') }}</div>
         <div
           v-for="(item, index) in categorySummary"
           :key="item.name"
@@ -87,18 +87,18 @@
     <!-- 对比卡片 -->
     <div v-if="categorySummary.length > 0" class="compare-section">
       <CompareCard
-        title="📊 环比对比（本月 vs 上月）"
-        :current-label="momData.currentMonth + ' 本月'"
-        :prev-label="momData.prevMonth + ' 上月'"
+        :title="t('stats.compareMom')"
+        :current-label="momData.currentMonth + ' ' + t('compare.current')"
+        :prev-label="momData.prevMonth + ' ' + t('compare.prev')"
         :current-total="momData.currentTotal"
         :prev-total="momData.prevTotal"
         :change-percent="momData.changePercent"
         :is-up="momData.isUp"
       />
       <CompareCard
-        title="📈 同比对比（本月 vs 去年同月）"
-        :current-label="yoyData.currentMonth + ' 今年'"
-        :prev-label="yoyData.prevYearMonth + ' 去年'"
+        :title="t('stats.compareYoy')"
+        :current-label="yoyData.currentMonth + ' ' + t('compare.current')"
+        :prev-label="yoyData.prevYearMonth + ' ' + t('compare.prevYear')"
         :current-total="yoyData.currentTotal"
         :prev-total="yoyData.prevYearTotal"
         :change-percent="yoyData.changePercent"
@@ -111,6 +111,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useExpenseStore } from '@/stores/expense'
+import { useI18n } from 'vue-i18n'
 import { accounts } from '@/data/accounts'
 import { exportToExcel } from '@/utils/export'
 import CompareCard from '@/components/CompareCard.vue'
@@ -121,6 +122,7 @@ import * as echarts from 'echarts'
 import { ElMessage } from 'element-plus'
 
 const store = useExpenseStore()
+const { t } = useI18n()
 const pieChartRef = ref<HTMLDivElement>()
 const lineChartRef = ref<HTMLDivElement>()
 let pieChart: echarts.ECharts | null = null
@@ -131,12 +133,12 @@ const dateStart = ref(getTodayStr())
 const dateEnd = ref(getTodayStr())
 const activeQuick = ref('month')
 
-const quickOptions = [
-  { key: '7d', label: '近7天' },
-  { key: '30d', label: '近30天' },
-  { key: 'month', label: '本月' },
-  { key: 'year', label: '本年' }
-]
+const quickOptions = computed(() => [
+  { key: '7d', label: t('stats.quickLabels.7d') },
+  { key: '30d', label: t('stats.quickLabels.30d') },
+  { key: 'month', label: t('stats.quickLabels.month') },
+  { key: 'year', label: t('stats.quickLabels.year') }
+])
 
 function getTodayStr(): string {
   const d = new Date()
@@ -181,9 +183,10 @@ function onDateChange(): void {
 
 const rangeLabel = computed(() => {
   if (activeQuick.value) {
-    return quickOptions.find(o => o.key === activeQuick.value)?.label + ' 总支出' || '区间总支出'
+    const opt = quickOptions.value.find(o => o.key === activeQuick.value)
+    return (opt?.label || '') + ' ' + t('stats.totalSpent')
   }
-  return '区间总支出'
+  return t('stats.totalSpent')
 })
 
 const rangeTotal = computed(() => store.getDateRangeTotal(dateStart.value, dateEnd.value))
@@ -290,21 +293,21 @@ async function initLineChart(): Promise<void> {
 function onExportExcel(): void {
   const list = store.getExpensesByDateRange(dateStart.value, dateEnd.value)
   if (list.length === 0) {
-    ElMessage.warning('当前范围暂无数据')
+    ElMessage.warning(t('stats.noData'))
     return
   }
-  exportToExcel(list, `黑马记账_${dateStart.value}_${dateEnd.value}.xlsx`)
-  ElMessage.success('Excel 已导出')
+  exportToExcel(list, `heimajizhang_${dateStart.value}_${dateEnd.value}.xlsx`)
+  ElMessage.success(t('stats.exportSuccess'))
 }
 
 function onExportPDF(): void {
   const list = store.getExpensesByDateRange(dateStart.value, dateEnd.value)
   if (list.length === 0) {
-    ElMessage.warning('当前范围暂无数据')
+    ElMessage.warning(t('stats.noData'))
     return
   }
-  generatePDFReport(list, `${dateStart.value} 至 ${dateEnd.value} 消费报告`)
-  ElMessage.success('PDF 报表已导出')
+  generatePDFReport(list, `${dateStart.value} ~ ${dateEnd.value}`)
+  ElMessage.success(t('stats.exportSuccess'))
 }
 
 function updateCharts(): void {

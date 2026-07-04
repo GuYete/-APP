@@ -1,22 +1,22 @@
 <template>
   <div class="predict-card">
-    <div class="predict-title">🔮 消费预测</div>
+    <div class="predict-title">{{ t('stats.prediction') }}</div>
 
-    <div v-if="total === 0" class="predict-empty">本月暂无消费记录</div>
+    <div v-if="total === 0" class="predict-empty">{{ t('stats.predict.noExpense') }}</div>
 
     <template v-else>
       <div class="predict-stats">
         <div class="stat-item">
           <span class="stat-value">¥{{ avgDaily.toFixed(0) }}</span>
-          <span class="stat-label">日均消费</span>
+          <span class="stat-label">{{ t('stats.predict.avgDaily') }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">¥{{ predicted.toFixed(0) }}</span>
-          <span class="stat-label">预测月底</span>
+          <span class="stat-label">{{ t('stats.predict.predictEnd') }}</span>
         </div>
         <div class="stat-item">
           <span class="stat-value">{{ passedDays }}天</span>
-          <span class="stat-label">本月已过</span>
+          <span class="stat-label">{{ t('stats.predict.passedDays') }}</span>
         </div>
       </div>
 
@@ -31,13 +31,13 @@
         </div>
         <div class="bar-labels">
           <span>{{ barPercent }}%</span>
-          <span v-if="budget > 0">预算 ¥{{ budget.toFixed(0) }}</span>
+          <span v-if="budget > 0">{{ t('predict.budget') }} ¥{{ budget.toFixed(0) }}</span>
         </div>
       </div>
 
       <!-- 预算对比 -->
       <div v-if="budget > 0" class="predict-verdict" :class="{ over: predicted > budget }">
-        {{ predicted > budget ? `⚠️ 按此趋势将超支 ¥${(predicted - budget).toFixed(0)}` : `✅ 预计不超预算，剩余 ¥${(budget - predicted).toFixed(0)}` }}
+        {{ predicted > budget ? t('predict.overBudget', [(predicted - budget).toFixed(0)]) : t('predict.underBudget', [(budget - predicted).toFixed(0)]) }}
       </div>
     </template>
   </div>
@@ -45,8 +45,10 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useExpenseStore } from '@/stores/expense'
 
+const { t } = useI18n()
 const store = useExpenseStore()
 
 const props = defineProps<{

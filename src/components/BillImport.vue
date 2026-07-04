@@ -3,16 +3,16 @@
     <!-- 选择文件 -->
     <div class="step" v-if="step === 0">
       <p class="step-hint">支持微信和支付宝导出的 CSV 账单文件</p>
-      <button class="pick-btn" @click="onPickFile">📂 选择 CSV 文件</button>
+      <button class="pick-btn" @click="onPickFile">📂 {{ t('import.selectFile') }}</button>
     </div>
 
     <!-- 预览 -->
     <div class="step" v-if="step === 1">
       <div class="preview-header">
-        <span>预览（共 {{ bills.length }} 条）</span>
+        <span>{{ t('import.preview', [bills.length]) }}</span>
         <div>
-          <button class="link-btn" @click="toggleAll(true)">全选</button>
-          <button class="link-btn" @click="toggleAll(false)">取消全选</button>
+          <button class="link-btn" @click="toggleAll(true)">{{ t('import.selectAll') }}</button>
+          <button class="link-btn" @click="toggleAll(false)">{{ t('import.deselectAll') }}</button>
         </div>
       </div>
       <div class="preview-list">
@@ -24,12 +24,12 @@
           <span class="preview-amount">{{ b.type === '支出' ? '-' : '+' }}¥{{ b.amount.toFixed(2) }}</span>
         </div>
       </div>
-      <button class="import-btn" @click="onImport">确认导入 {{ selectedCount }} 条</button>
+      <button class="import-btn" @click="onImport">{{ t('import.import') }} {{ selectedCount }} 条</button>
     </div>
 
     <!-- 完成 -->
     <div class="step" v-if="step === 2">
-      <p class="done-msg">✅ 导入完成，共 {{ imported }} 条</p>
+      <p class="done-msg">{{ t('import.done', [imported]) }}</p>
     </div>
   </div>
 </template>
@@ -37,11 +37,13 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useExpenseStore } from '@/stores/expense'
+import { useI18n } from 'vue-i18n'
 import { parseWechatCSV, parseAlipayCSV, billsToExpenses, type ParsedBill } from '@/utils/billImport'
 import { readFileAsText } from '@/utils/backup'
 import { ElMessage } from 'element-plus'
 
 const store = useExpenseStore()
+const { t } = useI18n()
 const step = ref(0)
 const bills = ref<ParsedBill[]>([])
 const imported = ref(0)

@@ -14,4 +14,9 @@ app.use(router)
 app.use(ElementPlus)
 app.use(i18n)
 
+// 全局错误捕获
+app.config.errorHandler = (err, _vm, info) => {
+  console.error('[Vue Error]', info, String(err))
+}
+
 app.mount('#app')

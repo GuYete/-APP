@@ -1,5 +1,4 @@
 import type { Expense } from '@/db'
-import { categories } from '@/data/categories'
 
 export interface ParsedBill {
   date: string

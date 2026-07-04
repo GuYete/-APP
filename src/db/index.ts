@@ -53,6 +53,15 @@ export interface RecurringBill {
   lastRecorded: string
 }
 
+export interface CustomCategory {
+  id?: number
+  name: string        // 分类名称
+  icon: string        // emoji 图标（仅 L1 有值）
+  color: string       // 颜色 hex（仅 L1 有值）
+  parentName: string  // 空 = 一级分类，非空 = 所属一级分类名称
+  createdAt: number
+}
+
 class ExpenseDB extends Dexie {
   expenses!: Table<Expense>
   settings!: Table<AppSettings>
@@ -60,6 +69,7 @@ class ExpenseDB extends Dexie {
   savingGoals!: Table<SavingGoal>
   templates!: Table<ExpenseTemplate>
   recurring!: Table<RecurringBill>
+  customCategories!: Table<CustomCategory>
 
   constructor() {
     super('heimajizhang')
@@ -108,6 +118,17 @@ class ExpenseDB extends Dexie {
           await tx.table('expenses').update(e.id, { photo: '' })
         }
       }
+    })
+
+    // v6: 自定义分类
+    this.version(6).stores({
+      expenses: '++id, categoryL1, categoryL2, date, account, createdAt',
+      settings: '++id',
+      budgets: '++id, yearMonth, categoryL1',
+      savingGoals: '++id',
+      templates: '++id',
+      recurring: '++id',
+      customCategories: '++id, parentName'
     })
   }
 }

@@ -40,6 +40,8 @@ export default {
     exportData: '导出数据备份', exportDataDesc: '将所有记账数据导出为 JSON 文件',
     importData: '导入数据恢复', importDataDesc: '从备份文件恢复数据',
     exportExcel: '导出 Excel 报表', exportExcelDesc: '将所有数据导出为 Excel 文件',
+    categories: '分类管理', categoriesDesc: '添加、修改、删除自定义分类',
+    pwdRequired: '请输入密码',
     version: '版本',
     exportOk: '数据备份已导出', exportFail: '导出失败',
     importOk: '导入完成：新增 {0} 条，跳过 {1} 条', importFail: '导入失败',
@@ -50,22 +52,28 @@ export default {
     totalMonthly: '💰 每月总预算', totalMonth: '月预算',
     categoryBudget: '📂 分类预算（可选）', save: '保存',
     totalSaved: '默认总预算已保存', monthSaved: '月预算已保存',
-    catSaved: '预算已保存'
+    catSaved: '预算已保存', totalHint: '默认应用于所有月份。可为特定月份单独设置。',
+    monthSpent: '本月已消费', remaining: '剩余', noLimit: '不限'
   },
   saving: {
-    create: '创建目标', namePlaceholder: '如：旅行基金',
-    amountLabel: '目标金额 ¥', deadlineLabel: '截止日期',
+    create: '创建目标', nameLabel: '目标名称', namePlaceholder: '如：旅行基金',
+    goalLabel: '目标', amountLabel: '目标金额 ¥', deadlineLabel: '截止日期',
     goalCreated: '目标已创建！', goalDeleted: '目标已删除',
     saved: '已存', remaining: '剩余', dailyNeed: '每天需存',
     update: '更新', updatePlaceholder: '更新已存金额',
-    updated: '已存金额已更新为 ¥{0}'
+    updated: '已存金额已更新为 ¥{0}',
+    deleteConfirm: '确定删除此目标吗？', fillAllFields: '请填写完整信息'
   },
   recurring: {
     namePlaceholder: '名称（如：房租）', amountPlaceholder: '金额',
     categoryPlaceholder: '选分类', subPlaceholder: '选小类',
     monthly: '每月', weekly: '每周', daily: '每天',
     dayPlaceholder: '几号', addBtn: '添加定期账单',
-    added: '定期账单已添加'
+    added: '定期账单已添加',
+    weekday0: '周日', weekday1: '周一', weekday2: '周二',
+    weekday3: '周三', weekday4: '周四', weekday5: '周五', weekday6: '周六',
+    daySuffix: '日', incomplete: '请填写完整信息',
+    deleteConfirm: '删除「{0}」？', deleteTitle: '确认'
   },
   import: {
     title: '导入账单', selectFile: '选择 CSV 文件',
@@ -74,6 +82,49 @@ export default {
     autoClassify: '根据商户名自动匹配分类',
     import: '确认导入', importing: '导入中...', done: '导入完成：{0} 条'
   },
-  voice: { listening: '正在聆听...', stop: '停止', retry: '重试', notSupported: '当前环境不支持语音识别' },
-  common: { yes: '确定', no: '取消', ok: '知道了' }
+  voice: { listening: '正在聆听...', stop: '停止', record: '语音记账', retry: '重试', notSupported: '当前环境不支持语音识别', recognitionFailed: '识别失败，请重试', noAmount: '未能识别金额' },
+  common: { yes: '确定', no: '取消', ok: '知道了' },
+  category: {
+    presetTitle: '预置分类（不可编辑）',
+    customTitle: '自定义分类',
+    empty: '暂无自定义分类，点击下方按钮添加',
+    addL1: '+ 添加一级分类',
+    addL2: '添加子分类',
+    editL1: '编辑一级分类',
+    editL2: '编辑子分类',
+    nameLabel: '分类名称',
+    namePlaceholder: '输入分类名称',
+    subNameLabel: '子分类名称',
+    subNamePlaceholder: '输入子分类名称',
+    iconLabel: '选择图标',
+    colorLabel: '选择颜色',
+    subCount: '{0}个小类',
+    deleteL1Title: '删除分类',
+    deleteL1Msg: '删除"{0}"后，该分类下的所有花销记录将自动归入"其他杂项 > 其他"。确定删除吗？',
+    deleteL2Title: '删除子分类',
+    deleteL2Msg: '删除"{0}"后，该分类下的所有花销记录将自动归入"其他杂项 > 其他"。确定删除吗？',
+    deleteConfirm: '确定删除',
+    added: '已添加"{0}"',
+    updated: '分类已更新',
+    deleted: '已删除"{0}"',
+    duplicate: '该分类名称已存在'
+  },
+  photo: { close: '关闭' },
+  predict: {
+    predicted: '预计月底总支出',
+    compared: '与预算相比',
+    over: '超支',
+    under: '剩余',
+    budget: '预算',
+    overBudget: '⚠️ 按此趋势将超支 ¥{0}',
+    underBudget: '✅ 预计不超预算，剩余 ¥{0}'
+  },
+  compare: {
+    current: '本月',
+    prev: '上月',
+    prevYear: '去年同月',
+    up: '增长',
+    down: '下降'
+  },
+  template: { deleteConfirm: '确定删除模板"{0}"吗？' }
 }

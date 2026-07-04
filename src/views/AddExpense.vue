@@ -2,13 +2,13 @@
   <div class="add-expense">
     <!-- 头部 -->
     <div class="page-header">
-      <h1 class="app-title">黑马记账</h1>
-      <p class="app-subtitle">记录每一笔花销</p>
+      <h1 class="app-title">{{ t('app.title') }}</h1>
+      <p class="app-subtitle">{{ t('app.subtitle') }}</p>
     </div>
 
     <!-- 金额输入 -->
     <div class="amount-card">
-      <div class="amount-label">金额</div>
+      <div class="amount-label">{{ t('add.amount') }}</div>
       <div class="amount-input-wrapper">
         <span class="currency-symbol">¥</span>
         <input
@@ -30,11 +30,11 @@
 
     <!-- 分类选择 -->
     <div class="section-card">
-      <div class="section-title">分类</div>
+      <div class="section-title">{{ t('add.category') }}（{{ catStore.allCategories.length }}）</div>
       <!-- 一级分类网格 -->
       <div class="category-grid">
         <div
-          v-for="cat in categories"
+          v-for="cat in catStore.allCategories"
           :key="cat.name"
           class="category-item"
           :class="{ selected: selectedL1 === cat.name }"
@@ -62,7 +62,7 @@
     <!-- 日期和备注 -->
     <div class="section-card">
       <div class="form-row">
-        <span class="form-label">日期</span>
+        <span class="form-label">{{ t('add.date') }}</span>
         <input
           v-model="date"
           type="date"
@@ -70,17 +70,17 @@
         />
       </div>
       <div class="form-row">
-        <span class="form-label">备注</span>
+        <span class="form-label">{{ t('add.note') }}</span>
         <input
           v-model="note"
           type="text"
           class="form-input"
-          placeholder="选填..."
+          :placeholder="t('add.notePlaceholder')"
           maxlength="50"
         />
       </div>
       <div class="form-row">
-        <span class="form-label">账户</span>
+        <span class="form-label">{{ t('add.account') }}</span>
         <div class="account-selector">
           <span
             v-for="acc in accounts"
@@ -94,12 +94,12 @@
         </div>
       </div>
       <div class="form-row">
-        <span class="form-label">票据</span>
+        <span class="form-label">{{ t('add.receipt') }}</span>
         <button class="photo-btn" @click="onPickPhoto">
-          {{ photo ? '📷 已选' : '📷 拍照/选图' }}
+          {{ photo ? t('add.photoDone') : t('add.photoBtn') }}
         </button>
         <button class="photo-btn" @click="onOCR" :disabled="ocrBusy">
-          {{ ocrBusy ? '⏳ 识别中...' : '🔍 OCR 识别' }}
+          {{ ocrBusy ? '⏳ ...' : t('add.ocrBtn') }}
         </button>
         <img v-if="photo" :src="photo" class="photo-preview" @click="showPhoto = true" />
       </div>
@@ -113,7 +113,7 @@
       :disabled="!canSave"
       @click="onSave"
     >
-      保存记账
+      {{ t('add.save') }}
     </button>
   </div>
 </template>
@@ -121,7 +121,8 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useExpenseStore } from '@/stores/expense'
-import { categories } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+import { useI18n } from 'vue-i18n'
 import { accounts } from '@/data/accounts'
 import { db, type ExpenseTemplate } from '@/db'
 import TemplateBar from '@/components/TemplateBar.vue'
@@ -131,6 +132,8 @@ import { recognizeAmount } from '@/utils/ocr'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
 const store = useExpenseStore()
+const catStore = useCategoryStore()
+const { t } = useI18n()
 
 const amountInputRef = ref<HTMLInputElement>()
 const templateBarRef = ref<InstanceType<typeof TemplateBar>>()
@@ -150,7 +153,7 @@ function getTodayStr(): string {
 }
 
 const currentSubCategories = computed(() => {
-  const cat = categories.find(c => c.name === selectedL1.value)
+  const cat = catStore.allCategories.find(c => c.name === selectedL1.value)
   return cat ? cat.children : []
 })
 
@@ -213,7 +216,7 @@ function onVoiceRecognized(data: { amount: number; categoryL1: string; categoryL
   selectedL1.value = data.categoryL1
   selectedL2.value = data.categoryL2
   note.value = data.note
-  ElMessage.success(`语音识别：¥${data.amount} ${data.categoryL2}`)
+  ElMessage.success(`Voice: ¥${data.amount} ${data.categoryL2}`)
 }
 
 async function onOCR(): Promise<void> {
@@ -252,7 +255,7 @@ async function onSave(): Promise<void> {
     photo: photo.value
   } as any)
 
-  ElMessage.success('记账成功！')
+  ElMessage.success(t('add.saveSuccess'))
   if (store.budgetAlerts.length > 0) {
     for (const alert of store.budgetAlerts) {
       ElMessage.warning(alert)
@@ -261,15 +264,15 @@ async function onSave(): Promise<void> {
 
   // 询问是否保存为模板
   try {
-    await ElMessageBox.confirm('是否保存为快捷模板？', '保存模板', {
-      confirmButtonText: '保存', cancelButtonText: '不用', type: 'info'
+    await ElMessageBox.confirm(t('add.saveAsTemplate'), '', {
+      confirmButtonText: t('add.saveTemplate'), cancelButtonText: t('add.noThanks'), type: 'info'
     })
     await db.templates.add({
-      name: `${categories.find(c => c.name === selectedL1.value)?.icon || ''} ${selectedL2.value} ¥${savedAmount}`,
+      name: `${catStore.allCategories.find(c => c.name === selectedL1.value)?.icon || ''} ${selectedL2.value} ¥${savedAmount}`,
       amount: savedAmount, categoryL1: selectedL1.value, categoryL2: selectedL2.value,
       account: selectedAccount.value, note: note.value, useCount: 0
     })
-    ElMessage.success('模板已保存')
+    ElMessage.success(t('add.templateSaved'))
   } catch { /* 用户取消 */ }
 
   amount.value = ''

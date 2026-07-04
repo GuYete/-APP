@@ -1,7 +1,7 @@
 <template>
   <div class="settings-page">
     <div class="page-header">
-      <h2 class="page-title">设置</h2>
+      <h2 class="page-title">{{ t('settings.title') }}</h2>
     </div>
 
     <!-- 主题切换 -->
@@ -10,8 +10,8 @@
         <div class="setting-info">
           <span class="setting-icon">{{ settings.theme === 'dark' ? '🌙' : '☀️' }}</span>
           <div>
-            <div class="setting-name">深色模式</div>
-            <div class="setting-desc">{{ settings.theme === 'dark' ? '已开启' : '已关闭' }}</div>
+            <div class="setting-name">{{ t('settings.darkMode') }}</div>
+            <div class="setting-desc">{{ settings.theme === 'dark' ? t('settings.on') : t('settings.off') }}</div>
           </div>
         </div>
         <label class="toggle-switch">
@@ -31,8 +31,8 @@
         <div class="setting-info">
           <span class="setting-icon">🔒</span>
           <div>
-            <div class="setting-name">应用锁</div>
-            <div class="setting-desc">{{ settings.lockEnabled ? '已开启' : '已关闭' }}</div>
+            <div class="setting-name">{{ t('settings.appLock') }}</div>
+            <div class="setting-desc">{{ settings.lockEnabled ? t('settings.on') : t('settings.off') }}</div>
           </div>
         </div>
         <label class="toggle-switch">
@@ -51,20 +51,20 @@
           v-model="lockPwd"
           type="password"
           class="lock-pwd-input"
-          placeholder="输入新密码"
+          :placeholder="t('settings.lockPwd')"
           maxlength="20"
         />
-        <button class="save-pwd-btn" @click="onSavePassword">保存密码</button>
+        <button class="save-pwd-btn" @click="onSavePassword">{{ t('settings.savePwd') }}</button>
       </div>
       <div v-if="showLockPwdInput" class="lock-password-section">
         <input
           v-model="lockPwd"
           type="password"
           class="lock-pwd-input"
-          placeholder="设置解锁密码"
+          :placeholder="t('settings.setLockPwd')"
           maxlength="20"
         />
-        <button class="save-pwd-btn" @click="onEnableLock">启用应用锁</button>
+        <button class="save-pwd-btn" @click="onEnableLock">{{ t('settings.enableLock') }}</button>
       </div>
     </div>
 
@@ -74,8 +74,8 @@
         <div class="setting-info">
           <span class="setting-icon">🎯</span>
           <div>
-            <div class="setting-name">预算管理</div>
-            <div class="setting-desc">设置每月预算和分类预算</div>
+            <div class="setting-name">{{ t('settings.budget') }}</div>
+            <div class="setting-desc">{{ t('settings.budgetDesc') }}</div>
           </div>
         </div>
         <span class="arrow" :class="{ open: showBudget }">›</span>
@@ -91,8 +91,8 @@
         <div class="setting-info">
           <span class="setting-icon">🎯</span>
           <div>
-            <div class="setting-name">存钱目标</div>
-            <div class="setting-desc">设定储蓄目标，追踪进度</div>
+            <div class="setting-name">{{ t('settings.saving') }}</div>
+            <div class="setting-desc">{{ t('settings.savingDesc') }}</div>
           </div>
         </div>
         <span class="arrow" :class="{ open: showSaving }">›</span>
@@ -108,8 +108,8 @@
         <div class="setting-info">
           <span class="setting-icon">🔄</span>
           <div>
-            <div class="setting-name">定期账单管理</div>
-            <div class="setting-desc">房租、订阅等自动记录</div>
+            <div class="setting-name">{{ t('settings.recurring') }}</div>
+            <div class="setting-desc">{{ t('settings.recurringDesc') }}</div>
           </div>
         </div>
         <span class="arrow" :class="{ open: showRecurring }">›</span>
@@ -121,13 +121,13 @@
 
     <!-- 数据管理 -->
     <div class="setting-card">
-      <div class="section-title">数据管理</div>
+      <div class="section-title">{{ t('settings.dataSection') }}</div>
       <div class="setting-row clickable" @click="onExportData">
         <div class="setting-info">
           <span class="setting-icon">📤</span>
           <div>
-            <div class="setting-name">导出数据备份</div>
-            <div class="setting-desc">将所有记账数据导出为 JSON 文件</div>
+            <div class="setting-name">{{ t('settings.exportData') }}</div>
+            <div class="setting-desc">{{ t('settings.exportDataDesc') }}</div>
           </div>
         </div>
         <span class="arrow">›</span>
@@ -136,8 +136,8 @@
         <div class="setting-info">
           <span class="setting-icon">📥</span>
           <div>
-            <div class="setting-name">导入数据恢复</div>
-            <div class="setting-desc">从备份文件恢复数据</div>
+            <div class="setting-name">{{ t('settings.importData') }}</div>
+            <div class="setting-desc">{{ t('settings.importDataDesc') }}</div>
           </div>
         </div>
         <span class="arrow">›</span>
@@ -146,8 +146,8 @@
         <div class="setting-info">
           <span class="setting-icon">📊</span>
           <div>
-            <div class="setting-name">导出 Excel 报表</div>
-            <div class="setting-desc">将所有数据导出为 Excel 文件</div>
+            <div class="setting-name">{{ t('settings.exportExcel') }}</div>
+            <div class="setting-desc">{{ t('settings.exportExcelDesc') }}</div>
           </div>
         </div>
         <span class="arrow">›</span>
@@ -160,8 +160,8 @@
         <div class="setting-info">
           <span class="setting-icon">📥</span>
           <div>
-            <div class="setting-name">导入账单</div>
-            <div class="setting-desc">导入微信/支付宝 CSV 账单</div>
+            <div class="setting-name">{{ t('settings.importBill') }}</div>
+            <div class="setting-desc">{{ t('settings.importBillDesc') }}</div>
           </div>
         </div>
         <span class="arrow" :class="{ open: showImport }">›</span>
@@ -171,13 +171,30 @@
       </div>
     </div>
 
+    <!-- 分类管理 -->
+    <div class="setting-card">
+      <div class="setting-row clickable" @click="showCategories = !showCategories">
+        <div class="setting-info">
+          <span class="setting-icon">📂</span>
+          <div>
+            <div class="setting-name">📂 {{ t('settings.categories') }}</div>
+            <div class="setting-desc">{{ t('settings.categoriesDesc') }}</div>
+          </div>
+        </div>
+        <span class="arrow" :class="{ open: showCategories }">›</span>
+      </div>
+      <div v-if="showCategories" class="expand-section">
+        <CategoryManager />
+      </div>
+    </div>
+
     <!-- 语言切换 -->
     <div class="setting-card">
       <div class="setting-row clickable" @click="toggleLanguage">
         <div class="setting-info">
           <span class="setting-icon">🌐</span>
           <div>
-            <div class="setting-name">语言</div>
+            <div class="setting-name">{{ t('settings.language') }}</div>
             <div class="setting-desc">{{ locale === 'zh-CN' ? '中文' : 'English' }} → 点击切换</div>
           </div>
         </div>
@@ -191,7 +208,7 @@
         <div class="setting-info">
           <span class="setting-icon">ℹ️</span>
           <div>
-            <div class="setting-name">版本</div>
+            <div class="setting-name">{{ t('settings.version') }}</div>
             <div class="setting-desc">v1.0.0</div>
           </div>
         </div>
@@ -207,6 +224,7 @@ import BudgetManager from '@/components/BudgetManager.vue'
 import SavingGoal from '@/components/SavingGoal.vue'
 import RecurringManager from '@/components/RecurringManager.vue'
 import BillImport from '@/components/BillImport.vue'
+import CategoryManager from '@/components/CategoryManager.vue'
 import { useI18n } from 'vue-i18n'
 import { useExpenseStore } from '@/stores/expense'
 import { exportToJSON, importFromJSON, downloadFile, readFileAsText } from '@/utils/backup'
@@ -222,6 +240,7 @@ const showBudget = ref(false)
 const showSaving = ref(false)
 const showRecurring = ref(false)
 const showImport = ref(false)
+const showCategories = ref(false)
 
 // i18n
 const { t, locale } = useI18n()
@@ -234,7 +253,7 @@ function toggleLanguage(): void {
 function onToggleLock(): void {
   if (settings.lockEnabled) {
     settings.disableLock()
-    ElMessage.success('应用锁已关闭')
+    ElMessage.success(t('settings.lockOff'))
   } else {
     showLockPwdInput.value = true
   }
@@ -242,23 +261,23 @@ function onToggleLock(): void {
 
 async function onEnableLock(): Promise<void> {
   if (!lockPwd.value) {
-    ElMessage.warning('请设置密码')
+    ElMessage.warning(t('settings.pwdRequired'))
     return
   }
   await settings.setLock(lockPwd.value)
   lockPwd.value = ''
   showLockPwdInput.value = false
-  ElMessage.success('应用锁已开启')
+  ElMessage.success(t('settings.lockOn'))
 }
 
 async function onSavePassword(): Promise<void> {
   if (!lockPwd.value) {
-    ElMessage.warning('请输入新密码')
+    ElMessage.warning(t('settings.pwdRequired'))
     return
   }
   await settings.setLock(lockPwd.value)
   lockPwd.value = ''
-  ElMessage.success('密码已更新')
+  ElMessage.success(t('settings.pwdUpdated'))
 }
 
 async function onExportData(): Promise<void> {
@@ -266,26 +285,26 @@ async function onExportData(): Promise<void> {
     const json = await exportToJSON()
     const filename = `黑马记账_备份_${new Date().toISOString().slice(0, 10)}.json`
     downloadFile(json, filename)
-    ElMessage.success('数据备份已导出')
+    ElMessage.success(t('settings.exportOk'))
   } catch {
-    ElMessage.error('导出失败')
+    ElMessage.error(t('settings.exportFail'))
   }
 }
 
 async function onImportData(): Promise<void> {
   try {
     await ElMessageBox.confirm(
-      '导入将合并数据（已存在的记录不会重复导入），确定继续吗？',
-      '导入确认',
-      { confirmButtonText: '确定', cancelButtonText: '取消', type: 'warning' }
+      t('settings.importConfirm'),
+      '',
+      { confirmButtonText: t('common.yes'), cancelButtonText: t('common.no'), type: 'warning' }
     )
     const json = await readFileAsText('.json')
     const result = await importFromJSON(json)
     await expenseStore.loadExpenses()
-    ElMessage.success(`导入完成：新增 ${result.imported} 条，跳过 ${result.skipped} 条`)
+    ElMessage.success(t('settings.importOk', [result.imported, result.skipped]))
   } catch (e: any) {
     if (e !== 'cancel' && e?.message) {
-      ElMessage.error(e.message || '导入失败')
+      ElMessage.error(e.message || t('settings.importFail'))
     }
   }
 }

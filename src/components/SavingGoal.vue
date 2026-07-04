@@ -3,18 +3,18 @@
     <!-- 添加新目标 -->
     <div v-if="!goal" class="add-goal">
       <div class="form-group">
-        <label>目标名称</label>
-        <input v-model="name" class="goal-input" placeholder="如：旅行基金" />
+        <label>{{ t('saving.nameLabel') }}</label>
+        <input v-model="name" class="goal-input" :placeholder="t('saving.namePlaceholder')" />
       </div>
       <div class="form-group">
-        <label>目标金额 ¥</label>
+        <label>{{ t('saving.amountLabel') }}</label>
         <input v-model.number="targetAmount" type="number" class="goal-input" placeholder="10000" min="0" step="100" />
       </div>
       <div class="form-group">
-        <label>截止日期</label>
+        <label>{{ t('saving.deadlineLabel') }}</label>
         <input v-model="deadline" type="date" class="goal-input" />
       </div>
-      <button class="create-btn" @click="onCreate">创建目标</button>
+      <button class="create-btn" @click="onCreate">{{ t('saving.create') }}</button>
     </div>
 
     <!-- 目标进度 -->
@@ -23,28 +23,28 @@
         <span class="goal-icon">🎯</span>
         <div>
           <div class="goal-name">{{ goal.name }}</div>
-          <div class="goal-target">目标 ¥{{ goal.targetAmount.toLocaleString() }}</div>
+          <div class="goal-target">{{ t('saving.goalLabel') }} ¥{{ goal.targetAmount.toLocaleString() }}</div>
         </div>
         <button class="delete-goal-btn" @click="onDelete">✕</button>
       </div>
 
       <div class="progress-section">
         <div class="progress-text">
-          <span>已存 ¥{{ saved.toLocaleString() }}</span>
+          <span>{{ t('saving.saved') }} ¥{{ saved.toLocaleString() }}</span>
           <span>{{ percent.toFixed(1) }}%</span>
         </div>
         <div class="progress-bar">
           <div class="progress-fill" :style="{ width: percent + '%' }"></div>
         </div>
         <div class="progress-info">
-          <span>剩余 ¥{{ (goal.targetAmount - saved).toLocaleString() }}</span>
-          <span v-if="daysLeft > 0">每天需存 ¥{{ dailyNeed.toFixed(0) }}</span>
+          <span>{{ t('saving.remaining') }} ¥{{ (goal.targetAmount - saved).toLocaleString() }}</span>
+          <span v-if="daysLeft > 0">{{ t('saving.dailyNeed') }} ¥{{ dailyNeed.toFixed(0) }}</span>
         </div>
       </div>
 
       <div class="update-saved">
-        <input v-model.number="addAmount" type="number" class="update-input" placeholder="更新已存金额" min="0" step="100" />
-        <button class="update-btn" @click="onUpdate">更新</button>
+        <input v-model.number="addAmount" type="number" class="update-input" :placeholder="t('saving.updatePlaceholder')" min="0" step="100" />
+        <button class="update-btn" @click="onUpdate">{{ t('saving.update') }}</button>
       </div>
     </div>
   </div>
@@ -52,8 +52,11 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { db, type Budget } from '@/db'
 import { ElMessage, ElMessageBox } from 'element-plus'
+
+const { t } = useI18n()
 
 interface Goal {
   id?: number
@@ -94,7 +97,7 @@ onMounted(async () => {
 
 async function onCreate(): Promise<void> {
   if (!name.value || targetAmount.value <= 0 || !deadline.value) {
-    ElMessage.warning('请填写完整信息')
+    ElMessage.warning(t('saving.fillAllFields'))
     return
   }
   const g: Goal = {
@@ -105,7 +108,7 @@ async function onCreate(): Promise<void> {
   }
   const id = await db.savingGoals.add(g as any)
   goal.value = { ...g, id: id as number }
-  ElMessage.success('目标已创建！')
+  ElMessage.success(t('saving.goalCreated'))
 }
 
 async function onUpdate(): Promise<void> {
@@ -114,17 +117,17 @@ async function onUpdate(): Promise<void> {
   await db.savingGoals.update(goal.value.id!, { saved: newSaved })
   goal.value.saved = newSaved
   addAmount.value = 0
-  ElMessage.success(`已存金额已更新为 ¥${newSaved.toLocaleString()}`)
+  ElMessage.success(t('saving.updated', [newSaved.toLocaleString()]))
 }
 
 async function onDelete(): Promise<void> {
   try {
-    await ElMessageBox.confirm('确定删除此目标吗？', '确认', { type: 'warning' })
+    await ElMessageBox.confirm(t('saving.deleteConfirm'), t('common.yes'), { type: 'warning' })
     if (goal.value?.id) {
       await db.savingGoals.delete(goal.value.id)
     }
     goal.value = null
-    ElMessage.success('目标已删除')
+    ElMessage.success(t('saving.goalDeleted'))
   } catch {}
 }
 </script>

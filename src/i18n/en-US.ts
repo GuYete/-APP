@@ -40,6 +40,8 @@ export default {
     exportData: 'Export Backup', exportDataDesc: 'Export all data as JSON',
     importData: 'Import Restore', importDataDesc: 'Restore from backup file',
     exportExcel: 'Export Excel', exportExcelDesc: 'Export all data as Excel',
+    categories: 'Category Manager', categoriesDesc: 'Add, edit, delete custom categories',
+    pwdRequired: 'Please enter a password',
     version: 'Version',
     exportOk: 'Backup exported', exportFail: 'Export failed',
     importOk: 'Imported: {0} new, {1} skipped', importFail: 'Import failed',
@@ -50,22 +52,28 @@ export default {
     totalMonthly: '💰 Monthly Budget', totalMonth: 'Month Budget',
     categoryBudget: '📂 Category Budget', save: 'Save',
     totalSaved: 'Default budget saved', monthSaved: 'Month budget saved',
-    catSaved: 'Budget saved'
+    catSaved: 'Budget saved', totalHint: 'Applies to all months. Can be overridden per month.',
+    monthSpent: 'Spent this month', remaining: 'Remaining', noLimit: 'No limit'
   },
   saving: {
-    create: 'Create Goal', namePlaceholder: 'e.g. Travel Fund',
-    amountLabel: 'Target ¥', deadlineLabel: 'Deadline',
+    create: 'Create Goal', nameLabel: 'Goal Name', namePlaceholder: 'e.g. Travel Fund',
+    goalLabel: 'Goal', amountLabel: 'Target ¥', deadlineLabel: 'Deadline',
     goalCreated: 'Goal created!', goalDeleted: 'Goal deleted',
     saved: 'Saved', remaining: 'Remaining', dailyNeed: 'Daily need',
     update: 'Update', updatePlaceholder: 'Add saved amount',
-    updated: 'Saved amount updated to ¥{0}'
+    updated: 'Saved amount updated to ¥{0}',
+    deleteConfirm: 'Delete this goal?', fillAllFields: 'Please fill in all fields'
   },
   recurring: {
     namePlaceholder: 'Name (e.g. Rent)', amountPlaceholder: 'Amount',
     categoryPlaceholder: 'Category', subPlaceholder: 'Sub-category',
     monthly: 'Monthly', weekly: 'Weekly', daily: 'Daily',
     dayPlaceholder: 'Day', addBtn: 'Add Recurring Bill',
-    added: 'Recurring bill added'
+    added: 'Recurring bill added',
+    weekday0: 'Sun', weekday1: 'Mon', weekday2: 'Tue',
+    weekday3: 'Wed', weekday4: 'Thu', weekday5: 'Fri', weekday6: 'Sat',
+    daySuffix: '', incomplete: 'Please fill in all fields',
+    deleteConfirm: 'Delete "{0}"?', deleteTitle: 'Confirm'
   },
   import: {
     title: 'Import Bills', selectFile: 'Select CSV File',
@@ -74,6 +82,49 @@ export default {
     autoClassify: 'Auto-classify by merchant name',
     import: 'Confirm Import', importing: 'Importing...', done: 'Imported: {0} items'
   },
-  voice: { listening: 'Listening...', stop: 'Stop', retry: 'Retry', notSupported: 'Voice not supported' },
-  common: { yes: 'OK', no: 'Cancel', ok: 'Got it' }
+  voice: { listening: 'Listening...', stop: 'Stop', record: 'Voice Input', retry: 'Retry', notSupported: 'Voice not supported', recognitionFailed: 'Recognition failed, please retry', noAmount: 'Could not recognize amount' },
+  common: { yes: 'OK', no: 'Cancel', ok: 'Got it' },
+  category: {
+    presetTitle: 'Preset Categories (Read-only)',
+    customTitle: 'Custom Categories',
+    empty: 'No custom categories. Add one below.',
+    addL1: '+ Add Category',
+    addL2: 'Add Sub-category',
+    editL1: 'Edit Category',
+    editL2: 'Edit Sub-category',
+    nameLabel: 'Category Name',
+    namePlaceholder: 'Enter category name',
+    subNameLabel: 'Sub-category Name',
+    subNamePlaceholder: 'Enter sub-category name',
+    iconLabel: 'Choose Icon',
+    colorLabel: 'Choose Color',
+    subCount: '{0} sub-categories',
+    deleteL1Title: 'Delete Category',
+    deleteL1Msg: 'Deleting "{0}" will move all its expenses to "Other > Other". Continue?',
+    deleteL2Title: 'Delete Sub-category',
+    deleteL2Msg: 'Deleting "{0}" will move all its expenses to "Other > Other". Continue?',
+    deleteConfirm: 'Delete',
+    added: 'Added "{0}"',
+    updated: 'Category updated',
+    deleted: 'Deleted "{0}"',
+    duplicate: 'This name already exists'
+  },
+  photo: { close: 'Close' },
+  predict: {
+    predicted: 'Predicted Month-End',
+    compared: 'vs Budget',
+    over: 'Over',
+    under: 'Under',
+    budget: 'Budget',
+    overBudget: '⚠️ Projected overspend ¥{0}',
+    underBudget: '✅ Under budget, ¥{0} remaining'
+  },
+  compare: {
+    current: 'This Month',
+    prev: 'Last Month',
+    prevYear: 'Last Year',
+    up: 'Up',
+    down: 'Down'
+  },
+  template: { deleteConfirm: 'Delete template "{0}"?' }
 }

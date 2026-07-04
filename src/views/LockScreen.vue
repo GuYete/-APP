@@ -2,8 +2,8 @@
   <div class="lock-screen">
     <div class="lock-card">
       <div class="lock-icon">🔒</div>
-      <h2 class="lock-title">黑马记账</h2>
-      <p class="lock-hint">请输入密码解锁</p>
+      <h2 class="lock-title">{{ t('lock.title') }}</h2>
+      <p class="lock-hint">{{ t('lock.hint') }}</p>
       <div class="lock-input-row">
         <input
           ref="pwdInput"
@@ -15,7 +15,7 @@
           @keydown.enter="onUnlock"
         />
       </div>
-      <button class="unlock-btn" @click="onUnlock">解锁</button>
+      <button class="unlock-btn" @click="onUnlock">{{ t('lock.unlock') }}</button>
       <p v-if="errorMsg" class="error-msg">{{ errorMsg }}</p>
     </div>
   </div>
@@ -24,9 +24,11 @@
 <script setup lang="ts">
 import { ref, onMounted, nextTick } from 'vue'
 import { useSettingsStore } from '@/stores/settings'
+import { useI18n } from 'vue-i18n'
 
 const emit = defineEmits<{ unlocked: [] }>()
 const settings = useSettingsStore()
+const { t } = useI18n()
 
 const password = ref('')
 const errorMsg = ref('')
@@ -34,13 +36,13 @@ const pwdInput = ref<HTMLInputElement>()
 
 function onUnlock(): void {
   if (!password.value) {
-    errorMsg.value = '请输入密码'
+    errorMsg.value = t('settings.pwdRequired')
     return
   }
   if (settings.verifyPassword(password.value)) {
     emit('unlocked')
   } else {
-    errorMsg.value = '密码错误，请重试'
+    errorMsg.value = t('lock.error')
     password.value = ''
   }
 }

@@ -22,13 +22,16 @@
       ></div>
     </div>
     <div class="compare-note">
-      相比{{ prevLabel }}，{{ isUp ? '增长' : '减少' }}{{ changePercent.toFixed(1) }}%
+      相比{{ prevLabel }}，{{ isUp ? t('compare.up') : t('compare.down') }}{{ changePercent.toFixed(1) }}%
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   title: string

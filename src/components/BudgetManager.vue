@@ -2,49 +2,49 @@
   <div class="budget-manager">
     <!-- 总预算设置 -->
     <div class="budget-section">
-      <div class="budget-section-title">💰 每月总预算</div>
+      <div class="budget-section-title">{{ t('budget.totalMonthly') }}</div>
       <div class="budget-input-row">
         <span class="currency">¥</span>
         <input
           v-model.number="totalBudget"
           type="number"
           class="budget-input"
-          placeholder="设置每月总预算"
+          :placeholder="t('budget.totalMonthly')"
           min="0"
           step="100"
         />
-        <button class="save-btn-sm" @click="saveTotalBudget">保存</button>
+        <button class="save-btn-sm" @click="saveTotalBudget">{{ t('budget.save') }}</button>
       </div>
       <div v-if="totalBudget > 0" class="budget-hint">
-        默认应用于所有月份。可为特定月份单独设置。
+        {{ t('budget.totalHint') }}
       </div>
     </div>
 
     <!-- 特定月份总预算 -->
     <div class="budget-section">
-      <div class="budget-section-title">📅 {{ currentMonth }} 月预算</div>
+      <div class="budget-section-title">📅 {{ currentMonth }} {{ t('budget.totalMonth') }}</div>
       <div class="budget-input-row">
         <span class="currency">¥</span>
         <input
           v-model.number="monthBudget"
           type="number"
           class="budget-input"
-          placeholder="为本月单独设置总预算"
+          :placeholder="t('budget.totalMonth')"
           min="0"
           step="100"
         />
-        <button class="save-btn-sm" @click="saveMonthBudget">保存</button>
+        <button class="save-btn-sm" @click="saveMonthBudget">{{ t('budget.save') }}</button>
       </div>
       <div v-if="monthBudget > 0" class="budget-hint">
-        本月已消费 ¥{{ monthSpent.toFixed(0) }}，剩余 ¥{{ (monthBudget - monthSpent).toFixed(0) }}
+        {{ t('budget.monthSpent') }} ¥{{ monthSpent.toFixed(0) }}，{{ t('budget.remaining') }} ¥{{ (monthBudget - monthSpent).toFixed(0) }}
       </div>
     </div>
 
     <!-- 分类预算 -->
     <div class="budget-section">
-      <div class="budget-section-title">📂 分类预算（可选）</div>
+      <div class="budget-section-title">{{ t('budget.categoryBudget') }}</div>
       <div
-        v-for="cat in categories"
+        v-for="cat in catStore.allCategories"
         :key="cat.name"
         class="category-budget-row"
       >
@@ -54,7 +54,7 @@
           v-model.number="categoryBudgets[cat.name]"
           type="number"
           class="cat-budget-input"
-          placeholder="不限"
+          :placeholder="t('budget.noLimit')"
           min="0"
           step="100"
         />
@@ -71,10 +71,13 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useExpenseStore } from '@/stores/expense'
-import { categories } from '@/data/categories'
+import { useCategoryStore } from '@/stores/category'
+import { useI18n } from 'vue-i18n'
 import { ElMessage } from 'element-plus'
 
 const store = useExpenseStore()
+const catStore = useCategoryStore()
+const { t } = useI18n()
 
 const currentMonth = store.selectedMonth
 const monthSpent = ref(0)
@@ -91,7 +94,7 @@ onMounted(async () => {
   totalBudget.value = store.getBudget('', '')
   monthBudget.value = store.getBudget(currentMonth, '')
 
-  for (const cat of categories) {
+  for (const cat of catStore.allCategories) {
     const b = store.getBudget(currentMonth, cat.name) || store.getBudget('', cat.name)
     if (b > 0) {
       categoryBudgets.value[cat.name] = b
@@ -110,7 +113,7 @@ async function saveTotalBudget(): Promise<void> {
   } else {
     await store.saveBudget({ yearMonth: '', categoryL1: '', amount: totalBudget.value })
   }
-  ElMessage.success('默认总预算已保存')
+  ElMessage.success(t('budget.totalSaved'))
 }
 
 async function saveMonthBudget(): Promise<void> {
@@ -121,14 +124,14 @@ async function saveMonthBudget(): Promise<void> {
   } else {
     await store.saveBudget({ yearMonth: currentMonth, categoryL1: '', amount: monthBudget.value })
   }
-  ElMessage.success(`${currentMonth} 总预算已保存`)
+  ElMessage.success(currentMonth + ' ' + t('budget.monthSaved'))
 }
 
 async function saveCategoryBudget(catName: string): Promise<void> {
   const amount = categoryBudgets.value[catName]
   if (!amount || amount <= 0) return
   await store.saveBudget({ yearMonth: currentMonth, categoryL1: catName, amount })
-  ElMessage.success(`${catName} 预算已保存`)
+  ElMessage.success(catName + ' ' + t('budget.catSaved'))
 }
 </script>
 
