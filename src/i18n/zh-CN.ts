@@ -1,6 +1,6 @@
 export default {
   app: { title: '黑马记账', subtitle: '记录每一笔花销' },
-  nav: { add: '记账', list: '明细', stats: '统计', settings: '设置' },
+  nav: { add: '记账', list: '明细', stats: '统计', snake: '贪吃蛇', settings: '设置' },
   add: {
     amount: '金额', category: '分类', date: '日期', note: '备注',
     notePlaceholder: '选填...', account: '账户', receipt: '票据',
@@ -126,5 +126,16 @@ export default {
     up: '增长',
     down: '下降'
   },
-  template: { deleteConfirm: '确定删除模板"{0}"吗？' }
+  template: { deleteConfirm: '确定删除模板"{0}"吗？' },
+  snake: {
+    title: '🐍 贪吃蛇',
+    score: '分数',
+    best: '最佳',
+    paused: '已暂停',
+    gameOver: '游戏结束！',
+    finalScore: '最终得分：{0} 分',
+    restart: '再来一局',
+    control: '方向键控制',
+    pause: '空格键暂停'
+  }
 }

@@ -1,6 +1,6 @@
 export default {
   app: { title: 'Finance Tracker', subtitle: 'Track every expense' },
-  nav: { add: 'Add', list: 'History', stats: 'Stats', settings: 'Settings' },
+  nav: { add: 'Add', list: 'History', stats: 'Stats', snake: 'Snake', settings: 'Settings' },
   add: {
     amount: 'Amount', category: 'Category', date: 'Date', note: 'Note',
     notePlaceholder: 'Optional...', account: 'Account', receipt: 'Receipt',
@@ -126,5 +126,16 @@ export default {
     up: 'Up',
     down: 'Down'
   },
-  template: { deleteConfirm: 'Delete template "{0}"?' }
+  template: { deleteConfirm: 'Delete template "{0}"?' },
+  snake: {
+    title: '🐍 Snake Game',
+    score: 'Score',
+    best: 'Best',
+    paused: 'Paused',
+    gameOver: 'Game Over!',
+    finalScore: 'Final Score: {0}',
+    restart: 'Play Again',
+    control: 'Arrow Keys',
+    pause: 'Space to Pause'
+  }
 }

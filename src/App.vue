@@ -43,6 +43,7 @@ const tabs = computed(() => [
   { path: '/add', icon: '✏️', label: t('nav.add') },
   { path: '/list', icon: '📋', label: t('nav.list') },
   { path: '/stats', icon: '📊', label: t('nav.stats') },
+  { path: '/snake', icon: '🐍', label: t('nav.snake') },
   { path: '/settings', icon: '⚙️', label: t('nav.settings') }
 ])
 
