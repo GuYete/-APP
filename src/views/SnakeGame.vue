@@ -25,6 +25,7 @@
         class="game-canvas"
         tabindex="0"
         @keydown="onKey"
+        @blur="onCanvasBlur"
       ></canvas>
 
       <!-- 暂停遮罩 -->
@@ -120,8 +121,7 @@ function spawnFood(): void {
   }
   if (free.length === 0) {
     // 赢了！
-    gameOver.value = true
-    saveBest(score.value)
+    endGame()
     return
   }
   food = free[Math.floor(Math.random() * free.length)]
@@ -242,8 +242,10 @@ function tick(): void {
     return
   }
 
-  // 撞自己
-  if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) {
+  // 撞自己（如果没吃到食物则忽略蛇尾，因为尾部本帧会被移除）
+  const ate = newHead.x === food.x && newHead.y === food.y
+  const checkSegments = ate ? snake : snake.slice(0, -1)
+  if (checkSegments.some(s => s.x === newHead.x && s.y === newHead.y)) {
     endGame()
     return
   }
@@ -302,13 +304,16 @@ function togglePause(): void {
 function changeDir(d: typeof dir): void {
   if (gameOver.value || paused.value) return
   const opposites: Record<string, string> = { up: 'down', down: 'up', left: 'right', right: 'left' }
-  if (opposites[d] === dir) return
+  if (opposites[d] === nextDir) return
   nextDir = d
 }
 
 function onKey(e: KeyboardEvent): void {
-  e.preventDefault()
+  // 忽略按键连发
+  if (e.repeat) return
+  // 空格：暂停/继续
   if (e.key === ' ' || e.code === 'Space') {
+    e.preventDefault()
     togglePause()
     return
   }
@@ -317,7 +322,17 @@ function onKey(e: KeyboardEvent): void {
     w: 'up', s: 'down', a: 'left', d: 'right',
     W: 'up', S: 'down', A: 'left', D: 'right',
   }
-  if (map[e.key]) changeDir(map[e.key])
+  if (map[e.key]) {
+    e.preventDefault()
+    changeDir(map[e.key])
+  }
+}
+
+function onCanvasBlur(): void {
+  // 画布失去焦点时自动暂停
+  if (!gameOver.value && !paused.value && timer) {
+    togglePause()
+  }
 }
 
 onMounted(() => {
@@ -327,6 +342,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (timer) clearInterval(timer)
+  saveBest(score.value)
 })
 </script>
 
